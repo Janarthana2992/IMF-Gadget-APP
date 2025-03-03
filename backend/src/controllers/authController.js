@@ -13,6 +13,8 @@ const SALT_ROUNDS = 10;
 exports.register = async (req, res, next) => {
   try {
     const { username, password, role = 'agent' } = req.body;
+    
+    console.log('Registration attempt:', username); // Debug log
 
     // Check if user already exists
     const existingUser = await prisma.user.findUnique({
@@ -20,6 +22,7 @@ exports.register = async (req, res, next) => {
     });
 
     if (existingUser) {
+      console.log('Username already exists:', username);
       return res.status(400).json({ message: 'Username already exists' });
     }
 
@@ -34,6 +37,8 @@ exports.register = async (req, res, next) => {
         role,
       },
     });
+    
+    console.log('User created successfully:', newUser.id);
 
     // Generate JWT token
     const token = jwt.sign(
@@ -51,6 +56,7 @@ exports.register = async (req, res, next) => {
       token,
     });
   } catch (error) {
+    console.error('Registration error:', error);
     next(error);
   }
 };
